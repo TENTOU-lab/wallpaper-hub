@@ -1,25 +1,1381 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>鹤临壁纸仓库 | 松的小窝</title>
     <style>
-      style_placeholder
-    </style>
-  </head>
-
-  <body>
-    <div class="content">
-      <!-- <img class="image" src="{{image_placeholder}}" /> -->
-      <p class="title">{{title}}</p>
-      <p class="error-desc">{{error_desc}}</p>
-      <p class="error-info">{{error_info}}</p>
-      <button class="btn" style="cursor:pointer" onclick="refreshPage()">{{refresh}}</button>
-      <script>
-        function refreshPage()   {
-          location = "{{url}}";
+        /* ================================
+           基础样式重置 & 全局设置
+           ================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-      </script>
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #f5f7f0 0%, #e8f0e8 50%, #f0f5f0 100%);
+            min-height: 100vh;
+            color: #4a5568;
+            line-height: 1.6;
+        }
+
+        /* ================================
+           主容器样式
+           ================================ */
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* ================================
+           头部区域
+           ================================ */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .title {
+            font-size: 28px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #718096;
+            margin-bottom: 24px;
+        }
+
+        /* ================================
+           松的问候语（小彩蛋）
+           ================================ */
+        .greeting {
+            background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+            border-radius: 16px;
+            padding: 16px 20px;
+            margin-bottom: 32px;
+            border-left: 4px solid #81c784;
+        }
+
+        .greeting p {
+            font-size: 14px;
+            color: #558b2f;
+        }
+
+        .greeting .author {
+            font-size: 12px;
+            color: #7cb342;
+            margin-top: 4px;
+        }
+
+        /* ================================
+           搜索区域
+           ================================ */
+        .search-box {
+            position: relative;
+            margin-bottom: 32px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 18px 20px;
+            padding-left: 52px;
+            font-size: 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            background: white;
+            transition: all 0.3s ease;
+            outline: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .search-input:focus {
+            border-color: #81c784;
+            box-shadow: 0 4px 20px rgba(129, 199, 132, 0.2);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            color: #a0aec0;
+        }
+
+        .search-hint {
+            font-size: 12px;
+            color: #a0aec0;
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        /* ================================
+           结果展示区域
+           ================================ */
+        .results {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .result-item {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            transition: all 0.3s ease;
+            border: 1px solid #e2e8f0;
+        }
+
+        .result-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .result-id {
+            background: linear-gradient(135deg, #81c784 0%, #66bb6a 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .result-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #2d3748;
+        }
+
+        .result-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            color: #4a5568;
+            padding: 12px 20px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            border: 1px dashed #cbd5e0;
+        }
+
+        .result-link:hover {
+            background: linear-gradient(135deg, #81c784 0%, #66bb6a 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .result-link-icon {
+            font-size: 16px;
+        }
+
+        /* ================================
+           无结果提示
+           ================================ */
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #a0aec0;
+        }
+
+        .no-results-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .no-results-text {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .no-results-hint {
+            font-size: 14px;
+            color: #cbd5e0;
+        }
+
+        /* ================================
+           初始提示
+           ================================ */
+        .initial-hint {
+            text-align: center;
+            padding: 40px 20px;
+            color: #a0aec0;
+        }
+
+        .initial-hint-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .initial-hint-text {
+            font-size: 14px;
+        }
+
+        /* ================================
+           页脚
+           ================================ */
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            padding: 20px;
+            color: #a0aec0;
+            font-size: 12px;
+        }
+
+        .footer a {
+            color: #81c784;
+            text-decoration: none;
+        }
+
+        /* ================================
+           动画效果
+           ================================ */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-item {
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* ================================
+           移动端适配
+           ================================ */
+        @media (max-width: 480px) {
+            .container {
+                padding: 24px 16px;
+            }
+
+            .title {
+                font-size: 24px;
+            }
+
+            .logo {
+                font-size: 40px;
+            }
+
+            .search-input {
+                padding: 16px 16px;
+                padding-left: 48px;
+                font-size: 15px;
+            }
+
+            .result-item {
+                padding: 16px;
+            }
+
+            .result-title {
+                font-size: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部区域 -->
+        <header class="header">
+            <div class="logo">🌲</div>
+            <h1 class="title">鹤临壁纸仓库</h1>
+            <p class="subtitle">输入笔记序列号，快速找到百度网盘链接</p>
+        </header>
+
+        <!-- 松的问候语 -->
+        <div class="greeting">
+            <p>嗨~ 欢迎来到鹤临的壁纸仓库！</p>
+            <p>我是松🌲，帮你更快找到喜欢的壁纸~</p>
+            <p class="author">—— by 松</p>
+        </div>
+
+        <!-- 搜索框 -->
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input 
+                type="text" 
+                class="search-input" 
+                id="searchInput" 
+                placeholder="输入序列号，如 001 或 No.001"
+                autocomplete="off"
+            >
+            <p class="search-hint">支持模糊搜索，输入 "1" 可匹配 "001"</p>
+        </div>
+
+        <!-- 搜索结果区域 -->
+        <div class="results" id="results">
+            <!-- 初始提示 -->
+            <div class="initial-hint" id="initialHint">
+                <div class="initial-hint-icon">✨</div>
+                <p class="initial-hint-text">输入序列号开始搜索吧~</p>
+            </div>
+        </div>
+
+        <!-- 页脚 -->
+        <footer class="footer">
+            <p>Made with 🌲 by 松</p>
+            <p>壁纸仓库 · 让找壁纸更简单</p>
+        </footer>
     </div>
-  </body>
+
+    <script>
+        // ================================
+        // 壁纸数据
+        // 格式：id-序列号，title-标题，link-百度网盘链接
+        // 鹤临可以在这里添加更多数据
+        // ================================
+        const wallpaperData = [
+            {
+                id: "Poke-001",
+                title: "宝可梦壁纸 #001",
+                link: "https://pan.baidu.com/s/12YqueKfT_JrekoZIltAUdQ?pwd=d797"
+            },
+            {
+                id: "Poke-002",
+                title: "宝可梦壁纸 #002",
+                link: "https://pan.baidu.com/s/1TBJ78KmPI0w3hIyIRjO9IA?pwd=yn62"
+            },
+            {
+                id: "Poke-003",
+                title: "宝可梦壁纸 #003",
+                link: "https://pan.baidu.com/s/1P-TAQ4ORecb-Dk8GdrSYJQ?pwd=9izi"
+            },
+            {
+                id: "Poke-004",
+                title: "宝可梦壁纸 #004",
+                link: "https://pan.baidu.com/s/1BkRKWUfMG6XwIE3sZPVd0w?pwd=txwq"
+            },
+            {
+                id: "Poke-005",
+                title: "宝可梦壁纸 #005",
+                link: "https://pan.baidu.com/s/1dDxYNZxyLujqIy7foQ4zzw?pwd=13zd"
+            },
+            {
+                id: "Poke-006",
+                title: "宝可梦壁纸 #006",
+                link: "https://pan.baidu.com/s/1vvx4b-DgQ77vLWFUTlzPNQ?pwd=jbrj"
+            },
+            {
+                id: "Poke-007",
+                title: "宝可梦壁纸 #007",
+                link: "https://pan.baidu.com/s/1dAUYsQa8SPDetgDwcbM_Xw?pwd=4zjj"
+            },
+            {
+                id: "Poke-008",
+                title: "宝可梦壁纸 #008",
+                link: "https://pan.baidu.com/s/1M7K5Zpm_RhYaZ43Xspam1A?pwd=6y86"
+            },
+            {
+                id: "Poke-009",
+                title: "宝可梦壁纸 #009",
+                link: "https://pan.baidu.com/s/18tqP1NsjLck9aPpWyyAFug?pwd=62vv"
+            },
+            {
+                id: "Poke-010",
+                title: "宝可梦壁纸 #010",
+                link: "https://pan.baidu.com/s/1UIOOQqExY9sxKjjgwWEpmg?pwd=7pjr"
+            },
+            {
+                id: "Poke-011",
+                title: "宝可梦壁纸 #011",
+                link: "https://pan.baidu.com/s/1hl-QcbE54CgT_fAXtyXLhQ?pwd=3i8w"
+            },
+            {
+                id: "Poke-012",
+                title: "宝可梦壁纸 #012",
+                link: "https://pan.baidu.com/s/1dWF6wCW3jG36-cHJRFf3vQ?pwd=qvg7"
+            },
+            {
+                id: "Poke-013",
+                title: "宝可梦壁纸 #013",
+                link: "https://pan.baidu.com/s/10Dosw78bb9Uy8d2ouoH3vw?pwd=65kg"
+            },
+            {
+                id: "Poke-014",
+                title: "宝可梦壁纸 #014",
+                link: "https://pan.baidu.com/s/1Bx5zKO57Xxamj6zhZB_XDw?pwd=h8pb"
+            },
+            {
+                id: "Poke-015",
+                title: "宝可梦壁纸 #015",
+                link: "https://pan.baidu.com/s/19yGg2DeVuvHN83t1OHqQiA?pwd=254k"
+            },
+            {
+                id: "Poke-016",
+                title: "宝可梦壁纸 #016",
+                link: "https://pan.baidu.com/s/1LKXdnIEt4D1v475gF-yYhw?pwd=q73r"
+            },
+            {
+                id: "Poke-017",
+                title: "宝可梦壁纸 #017",
+                link: "https://pan.baidu.com/s/1xNLhTrom6w_O9PH222A4TQ?pwd=c6wf"
+            },
+            {
+                id: "Poke-018",
+                title: "宝可梦壁纸 #018",
+                link: "https://pan.baidu.com/s/10OOgX2Bc0X2P-zMw88d5jg?pwd=5prh"
+            },
+            {
+                id: "Poke-019",
+                title: "宝可梦壁纸 #019",
+                link: "https://pan.baidu.com/s/1OBJdsancWoFkMUi7Np0y4A?pwd=y1ej"
+            },
+            {
+                id: "Poke-020",
+                title: "宝可梦壁纸 #020",
+                link: "https://pan.baidu.com/s/1M5n1uhBsMEF8oo_oA0Hyfw?pwd=bn7v"
+            },
+            {
+                id: "Poke-021",
+                title: "宝可梦壁纸 #021",
+                link: "https://pan.baidu.com/s/1xe3YEJwxKXeKWEbFSIbZmw?pwd=6dzk"
+            },
+            {
+                id: "Poke-022",
+                title: "宝可梦壁纸 #022",
+                link: "https://pan.baidu.com/s/11E9_CYvFcPL1g4pr0R7Nzw?pwd=3vj8"
+            },
+            {
+                id: "Poke-023",
+                title: "宝可梦壁纸 #023",
+                link: "https://pan.baidu.com/s/10hl9to_0WQOIWSMQJfe9pw?pwd=7mmp"
+            },
+            {
+                id: "Poke-024",
+                title: "宝可梦壁纸 #024",
+                link: "https://pan.baidu.com/s/1PYReW7cVJPGgTgMDvfUa0w?pwd=a5s6"
+            },
+            {
+                id: "Poke-025",
+                title: "宝可梦壁纸 #025",
+                link: "https://pan.baidu.com/s/1sCESPErz3-2oiUstBwh_bA?pwd=5skq"
+            },
+            {
+                id: "Poke-026",
+                title: "宝可梦壁纸 #026",
+                link: "https://pan.baidu.com/s/1am-HIsinIxbgojIOCeG4gg"
+            },
+            {
+                id: "Poke-027",
+                title: "宝可梦壁纸 #027",
+                link: "https://pan.baidu.com/s/1LbN0WFknFpL5rCoNPFdJyg?pwd=m7md"
+            },
+            {
+                id: "Poke-028",
+                title: "宝可梦壁纸 #028",
+                link: "https://pan.baidu.com/s/1uG55ksU9-prEPwAnH9yJ0g?pwd=r88e"
+            },
+            {
+                id: "Poke-029",
+                title: "宝可梦壁纸 #029",
+                link: "https://pan.baidu.com/s/1r5lvwuubntOjf-ncWJoW8Q?pwd=97x9"
+            },
+            {
+                id: "Poke-030",
+                title: "宝可梦壁纸 #030",
+                link: "https://pan.baidu.com/s/1lfijiS-R3DupcBuYDb5Hjw?pwd=e2a5"
+            },
+            {
+                id: "Poke-031",
+                title: "宝可梦壁纸 #031",
+                link: "https://pan.baidu.com/s/1fLwTTW1QnMejJPbWIWyysQ?pwd=q5q1"
+            },
+            {
+                id: "Poke-032",
+                title: "宝可梦壁纸 #032",
+                link: "https://pan.baidu.com/s/12sIy0TCCPvVxQ-5ufpZfXA?pwd=7e3f"
+            },
+            {
+                id: "Poke-033",
+                title: "宝可梦壁纸 #033",
+                link: "https://pan.baidu.com/s/12qKMZdWeOIwyq8ggshS4BQ?pwd=5fff"
+            },
+            {
+                id: "Poke-034",
+                title: "宝可梦壁纸 #034",
+                link: "https://pan.baidu.com/s/1ID-USrBpwpW3twzbzAnIlA?pwd=md7q"
+            },
+            {
+                id: "Poke_L-001",
+                title: "宝可梦壁纸（横版） #001",
+                link: "https://pan.baidu.com/s/1lWCc7irCu-NpXjOkzvymXA?pwd=ifga"
+            },
+            {
+                id: "Poke_L-002",
+                title: "宝可梦壁纸（横版） #002",
+                link: "https://pan.baidu.com/s/1IAep3LJyQEgDD2Iyshhklw?pwd=cfgy"
+            },
+            {
+                id: "Poke_L-003",
+                title: "宝可梦壁纸（横版） #003",
+                link: "https://pan.baidu.com/s/1o-zDO01-_7Oz4obMu7Kzig?pwd=dfh4"
+            },
+            {
+                id: "Poke_L-004",
+                title: "宝可梦壁纸（横版） #004",
+                link: "https://pan.baidu.com/s/1PyNqNoz6CUR973xEksva-Q?pwd=2dda"
+            },
+            {
+                id: "Poke_L-005",
+                title: "宝可梦壁纸（横版） #005",
+                link: "https://pan.baidu.com/s/1pC3lY2FADUvFKNaGMjhVtA?pwd=quy7"
+            },
+            {
+                id: "Poke_L-006",
+                title: "宝可梦壁纸（横版） #006",
+                link: "https://pan.baidu.com/s/1WHdLIo7hQ5qB7uSWeKL7BQ?pwd=k6u1"
+            },
+            {
+                id: "Poke_L-007",
+                title: "宝可梦壁纸（横版） #007",
+                link: "https://pan.baidu.com/s/1W2EvN02djOOk4VHajDmIpg?pwd=7gp6"
+            },
+            {
+                id: "Poke_L-008",
+                title: "宝可梦壁纸（横版） #008",
+                link: "https://pan.baidu.com/s/1HD7ty_Kv7bsBFJZ1ccr_Yg?pwd=bh95"
+            },
+            {
+                id: "Poke_L-009",
+                title: "宝可梦壁纸（横版） #009",
+                link: "https://pan.baidu.com/s/1j0RXdfnN3j5tf0XSdd-g3Q?pwd=7rnq"
+            },
+            {
+                id: "Poke_L-010",
+                title: "宝可梦壁纸（横版） #010",
+                link: "https://pan.baidu.com/s/1ttQ_taBJ27fajLK2uIRoKg?pwd=uijd"
+            },
+            {
+                id: "Poke_L-011",
+                title: "宝可梦壁纸（横版） #011",
+                link: "https://pan.baidu.com/s/1tr-PrXKX6d78YTCm9v3BLw?pwd=au3i"
+            },
+            {
+                id: "Poke_L-012",
+                title: "宝可梦壁纸（横版） #012",
+                link: "https://pan.baidu.com/s/1lqEmt9GXOKtE16Eif-pJJg?pwd=j5cu"
+            },
+            {
+                id: "Poke_L-013",
+                title: "宝可梦壁纸（横版） #013",
+                link: "https://pan.baidu.com/s/1EWa-qBdUdpteTyWKKSvXKw?pwd=tv4p"
+            },
+            {
+                id: "Poke_L-014",
+                title: "宝可梦壁纸（横版） #014",
+                link: "https://pan.baidu.com/s/1OQajkopzZmWQWgiHPU-A8w?pwd=782t"
+            },
+            {
+                id: "Poke_L-015",
+                title: "宝可梦壁纸（横版） #015",
+                link: "https://pan.baidu.com/s/16qjo9mc2BkG8EBfTWiVqXQ?pwd=tjfn"
+            },
+            {
+                id: "Poke_L-016",
+                title: "宝可梦壁纸（横版） #016",
+                link: "https://pan.baidu.com/s/1UvOBjOgNaWNNTxA8sDGLKA?pwd=6ujd"
+            },
+            {
+                id: "Poke_L-017",
+                title: "宝可梦壁纸（横版） #017",
+                link: "https://pan.baidu.com/s/1tk3GDsX5bIybZ1qbIghexA?pwd=bbtv"
+            },
+            {
+                id: "Poke_L-018",
+                title: "宝可梦壁纸（横版） #018",
+                link: "https://pan.baidu.com/s/1Ao0tHCY1YErqRtCMLbl1AA?pwd=mrx2"
+            },
+            {
+                id: "Poke_L-019",
+                title: "宝可梦壁纸（横版） #019",
+                link: "https://pan.baidu.com/s/1X0YyYnS_zdGlLbJXGVwVzQ?pwd=4u8a"
+            },
+            {
+                id: "Poke_L-020",
+                title: "宝可梦壁纸（横版） #020",
+                link: "https://pan.baidu.com/s/1IqziyDe46TEte2tHpq71Fg?pwd=ur9e"
+            },
+            {
+                id: "Poke_L-021",
+                title: "宝可梦壁纸（横版） #021",
+                link: "https://pan.baidu.com/s/1OLd1PfTg7MogwE-NtwRNyQ?pwd=kqzs"
+            },
+            {
+                id: "Poke_L-022",
+                title: "宝可梦壁纸（横版） #022",
+                link: "https://pan.baidu.com/s/1jFpGDdxwZoaEQYfJrCtmJA?pwd=usu5"
+            },
+            {
+                id: "Poke_L-023",
+                title: "宝可梦壁纸（横版） #023",
+                link: "https://pan.baidu.com/s/198r92U1Vf7M2OOj1AJC9XA?pwd=x9sc"
+            },
+            {
+                id: "Poke_L-024",
+                title: "宝可梦壁纸（横版） #024",
+                link: "https://pan.baidu.com/s/1jOkz8-SfjeTPTUfMZMim4Q?pwd=vi67"
+            },
+            {
+                id: "Poke_L-025",
+                title: "宝可梦壁纸（横版） #025",
+                link: "https://pan.baidu.com/s/1iS7yT4_CUOEOu2ZynMsrpg?pwd=5q95"
+            },
+            {
+                id: "Poke_L-026",
+                title: "宝可梦壁纸（横版） #026",
+                link: "https://pan.baidu.com/s/1jYVquKwUWEjkmjKjh5-VdA?pwd=aa4u"
+            },
+            {
+                id: "Poke_L-027",
+                title: "宝可梦壁纸（横版） #027",
+                link: "https://pan.baidu.com/s/1K8CVMmoj9vMnQkRElTA1-w?pwd=36e6"
+            },
+            {
+                id: "Poke_L-028",
+                title: "宝可梦壁纸（横版） #028",
+                link: "https://pan.baidu.com/s/1rMwudIfiShDamM38kOI8PQ?pwd=7m51"
+            },
+            {
+                id: "Poke_L-029",
+                title: "宝可梦壁纸（横版） #029",
+                link: "https://pan.baidu.com/s/1H2CWjKzW084by6QQ4zULTA?pwd=r29e"
+            },
+            {
+                id: "Poke_L-030",
+                title: "宝可梦壁纸（横版） #030",
+                link: "https://pan.baidu.com/s/1TSsgSLe2fYZJ4Tvu0In7tg?pwd=r4mu"
+            },
+            {
+                id: "Poke_L-031",
+                title: "宝可梦壁纸（横版） #031",
+                link: "https://pan.baidu.com/s/1YZFKPBAL6HDnqMU5uSN2Ow?pwd=8kv2"
+            },
+            {
+                id: "Poke_L-032",
+                title: "宝可梦壁纸（横版） #032",
+                link: "https://pan.baidu.com/s/16jT3TTcPc4KACh3UI55VOQ?pwd=v5df"
+            },
+            {
+                id: "Poke_L-033",
+                title: "宝可梦壁纸（横版） #033",
+                link: "https://pan.baidu.com/s/19ydz7TXp1skCECrP3bznHw?pwd=tncy"
+            },
+            {
+                id: "Poke_L-034",
+                title: "宝可梦壁纸（横版） #034",
+                link: "https://pan.baidu.com/s/14k84r7TdGlVBB6lydPMabg?pwd=1mpp"
+            },
+            {
+                id: "Poke_L-035",
+                title: "宝可梦壁纸（横版） #035",
+                link: "https://pan.baidu.com/s/1c8-QSHMewh_u78ZC1XQw9A?pwd=mymm"
+            },
+            {
+                id: "Poke_L-036",
+                title: "宝可梦壁纸（横版） #036",
+                link: "https://pan.baidu.com/s/1855yG-hT4vaqsKn_7PFvTw?pwd=bneg"
+            },
+            {
+                id: "Poke_L-037",
+                title: "宝可梦壁纸（横版） #037",
+                link: "https://pan.baidu.com/s/1Bja407lEZojqTd49igaeSw?pwd=rje4"
+            },
+            {
+                id: "Poke_L-038",
+                title: "宝可梦壁纸（横版） #038",
+                link: "https://pan.baidu.com/s/1n5o_noanNbSO169TfjCFUQ?pwd=e4r2"
+            },
+            {
+                id: "Poke_L-039",
+                title: "宝可梦壁纸（横版） #039",
+                link: "https://pan.baidu.com/s/13RTAc_i9IAGGTicBfnPeBQ?pwd=s2v4"
+            },
+            {
+                id: "Poke_L-040",
+                title: "宝可梦壁纸（横版） #040",
+                link: "https://pan.baidu.com/s/1GcxbsrUku51FjYHduLQLLw?pwd=7cmk"
+            },
+            {
+                id: "Poke_L-041",
+                title: "宝可梦壁纸（横版） #041",
+                link: "https://pan.baidu.com/s/1L6_H2pZJeaRGdmMwcbHvTw?pwd=gbbb"
+            },
+            {
+                id: "Poke_L-042",
+                title: "宝可梦壁纸（横版） #042",
+                link: "https://pan.baidu.com/s/1ns66brHwvqdLZ3CBB9ZAxw?pwd=ak1a"
+            },
+            {
+                id: "Poke_L-043",
+                title: "宝可梦壁纸（横版） #043",
+                link: "https://pan.baidu.com/s/1WqXnr_AuZYfFsIQI_s39wA?pwd=eznw"
+            },
+            {
+                id: "Poke_L-044",
+                title: "宝可梦壁纸（横版） #044",
+                link: "https://pan.baidu.com/s/17BptjmqddGj6sNFO_2JeoA?pwd=nj2g"
+            },
+            {
+                id: "Poke_L-045",
+                title: "宝可梦壁纸（横版） #045",
+                link: "https://pan.baidu.com/s/1LLk4jj-4z8kCLFStDRhgpg?pwd=xbng"
+            },
+            {
+                id: "Poke_L-046",
+                title: "宝可梦壁纸（横版） #046",
+                link: "https://pan.baidu.com/s/1cyPAIgiVGByfODAWV9lmlg?pwd=nyan"
+            },
+            {
+                id: "Kamen-001",
+                title: "假面骑士壁纸 #001",
+                link: "https://pan.baidu.com/s/1gT9E0UAVq3G3AQjMh0FWVg?pwd=qjwh"
+            },
+            {
+                id: "Kamen-002",
+                title: "假面骑士壁纸 #002",
+                link: "https://pan.baidu.com/s/1sOP4WH68fBVvOtXVZgUOzw?pwd=y2mx"
+            },
+            {
+                id: "Kamen-003",
+                title: "假面骑士壁纸 #003",
+                link: "https://pan.baidu.com/s/1yz_MJAwEl-0OhtHgzttDKg?pwd=2swc"
+            },
+            {
+                id: "Kamen-004",
+                title: "假面骑士壁纸 #004",
+                link: "https://pan.baidu.com/s/1cn0b_-Ot3XzFO9ofhVjLmg?pwd=qvmi"
+            },
+            {
+                id: "Kamen-005",
+                title: "假面骑士壁纸 #005",
+                link: "https://pan.baidu.com/s/1wDGNg-D8E1Fjbzmb1CmuOQ?pwd=ujtg"
+            },
+            {
+                id: "Kamen-006",
+                title: "假面骑士壁纸 #006",
+                link: "https://pan.baidu.com/s/1V1-3nu6LKj86ob_KNd5FvQ?pwd=g9nu"
+            },
+            {
+                id: "Kamen-007",
+                title: "假面骑士壁纸 #007",
+                link: "https://pan.baidu.com/s/18k0fqjqDm11kdsZ8_auLbg?pwd=9jpx"
+            },
+            {
+                id: "Miyazaki-001",
+                title: "宫崎骏壁纸 #001",
+                link: "https://pan.baidu.com/s/1P5hkqvXOnlFPdubKWgSquw?pwd=et8n"
+            },
+            {
+                id: "Miyazaki-002",
+                title: "宫崎骏壁纸 #002",
+                link: "https://pan.baidu.com/s/1rxp-hGN_DbX5AHDPzl0PEQ?pwd=agfj"
+            },
+            {
+                id: "EVA-001",
+                title: "EVA壁纸 #001",
+                link: "https://pan.baidu.com/s/1ks5_wNLH_dTmpMQvP4okXQ?pwd=hnsn"
+            },
+            {
+                id: "EVA-002",
+                title: "EVA壁纸 #002",
+                link: "https://pan.baidu.com/s/1gtDB-MUVFFerLpNAam94SA?pwd=rzj7"
+            },
+            {
+                id: "EVA-003",
+                title: "EVA壁纸 #003",
+                link: "https://pan.baidu.com/s/16phAUL-DFDfvHKW0Ydbg5w?pwd=ic3k"
+            },
+            {
+                id: "EVA-004",
+                title: "EVA壁纸 #004",
+                link: "https://pan.baidu.com/s/16phAUL-DFDfvHKW0Ydbg5w?pwd=ic3k"
+            },
+            {
+                id: "EVA-005",
+                title: "EVA壁纸 #005",
+                link: "https://pan.baidu.com/s/1WLRvrMiEKqrZbqgsuvQPiw?pwd=jtsi"
+            },
+            {
+                id: "EVA-006",
+                title: "EVA壁纸 #006",
+                link: "https://pan.baidu.com/s/1WLRvrMiEKqrZbqgsuvQPiw?pwd=jtsi"
+            },
+            {
+                id: "EVA-007",
+                title: "EVA壁纸 #007",
+                link: "https://pan.baidu.com/s/1vlnUn7Ar8ElhqthzUHqV5A?pwd=7ujj"
+            },
+            {
+                id: "EVA-008",
+                title: "EVA壁纸 #008",
+                link: "https://pan.baidu.com/s/1XZAPKIasiY8Dm7iRCw7pMg?pwd=qvc6"
+            },
+            {
+                id: "EVA-009",
+                title: "EVA壁纸 #009",
+                link: "https://pan.baidu.com/s/10AocBIq2xT_bcRVwFsDXbg?pwd=5scx"
+            },
+            {
+                id: "EVA-010",
+                title: "EVA壁纸 #010",
+                link: "https://pan.baidu.com/s/1MR402D3nMdJdBXFEk4S91A?pwd=sfqn"
+            },
+            {
+                id: "EVA-011",
+                title: "EVA壁纸 #011",
+                link: "https://pan.baidu.com/s/1ILnEXa2gXOxZk4jcqWs6ag?pwd=5czv"
+            },
+            {
+                id: "EVA-012",
+                title: "EVA壁纸 #012",
+                link: "https://pan.baidu.com/s/1TJ6Y_kAzq8OmGOs8gum98w?pwd=qfck"
+            },
+            {
+                id: "EVA-013",
+                title: "EVA壁纸 #013",
+                link: "https://pan.baidu.com/s/1qwKBGULG7AmfkG0rGOkn7Q?pwd=w39f"
+            },
+            {
+                id: "EVA_L-001",
+                title: "EVA壁纸（横版） #001",
+                link: "https://pan.baidu.com/s/1lF8TECx2lO2Czm5_lyEw1g?pwd=ygj9"
+            },
+            {
+                id: "EVA_L-002",
+                title: "EVA壁纸（横版） #002",
+                link: "https://pan.baidu.com/s/1ZQt9agNAnQPua8eRHXCsyA?pwd=qy8v"
+            },
+            {
+                id: "EVA_L-003",
+                title: "EVA壁纸（横版） #003",
+                link: "https://pan.baidu.com/s/1fFOuOhwCqnI1_KfrwUxp-g?pwd=2kvw"
+            },
+            {
+                id: "EVA_L-004",
+                title: "EVA壁纸（横版） #004",
+                link: "https://pan.baidu.com/s/1D2zCSTofxGUfFaKZ0PFw3w?pwd=8323"
+            },
+            {
+                id: "EVA_L-005",
+                title: "EVA壁纸（横版） #005",
+                link: "https://pan.baidu.com/s/1U30R06KqyopfiaZvgR5w9Q?pwd=ps4n"
+            },
+            {
+                id: "EVA_L-006",
+                title: "EVA壁纸（横版） #006",
+                link: "https://pan.baidu.com/s/1eJrdSPiNbW33-cYc8eQLvA?pwd=qiv7"
+            },
+            {
+                id: "EVA_L-007",
+                title: "EVA壁纸（横版） #007",
+                link: "https://pan.baidu.com/s/1rkdzsakWFt68QdPx0uq4LA?pwd=qfar"
+            },
+            {
+                id: "EVA_L-008",
+                title: "EVA壁纸（横版） #008",
+                link: "https://pan.baidu.com/s/1QtFmavghGUyv_4JMAjrdbg?pwd=tam5"
+            },
+            {
+                id: "EVA_L-009",
+                title: "EVA壁纸（横版） #009",
+                link: "https://pan.baidu.com/s/1Gfk8Zy-gZc_BFvacpXawRw?pwd=3juu"
+            },
+            {
+                id: "EVA_L-010",
+                title: "EVA壁纸（横版） #010",
+                link: "https://pan.baidu.com/s/1rvaSv08HDIDwDdh5VsLB6g?pwd=9brn"
+            },
+            {
+                id: "EVA_L-011",
+                title: "EVA壁纸（横版） #011",
+                link: "https://pan.baidu.com/s/1HPgVXzkw9HlLGe15LdXDsA?pwd=fr8h"
+            },
+            {
+                id: "SK-001",
+                title: "SK壁纸 #001",
+                link: "https://pan.baidu.com/s/1XhCORPVzWy0xfANP-9Qzbg?pwd=2e46"
+            },
+            {
+                id: "SK-002",
+                title: "SK壁纸 #002",
+                link: "https://pan.baidu.com/s/1XhCORPVzWy0xfANP-9Qzbg?pwd=2e46"
+            },
+            {
+                id: "SK-003",
+                title: "SK壁纸 #003",
+                link: "https://pan.baidu.com/s/1LQ89941faFHXLUHsPkzoig?pwd=zrbq"
+            },
+            {
+                id: "SK-004",
+                title: "SK壁纸 #004",
+                link: "https://pan.baidu.com/s/1FPyqNMYEmcB5Rbhr_F_paA?pwd=nu7v"
+            },
+            {
+                id: "SK-005",
+                title: "SK壁纸 #005",
+                link: "https://pan.baidu.com/s/1_u1PrSYhlcNon25x7zYEGw?pwd=tnbr"
+            },
+            {
+                id: "SK-006",
+                title: "SK壁纸 #006",
+                link: "https://pan.baidu.com/s/1ErcD8WQMrd157zWD2E_9_Q?pwd=4jkj"
+            },
+            {
+                id: "SK-007",
+                title: "SK壁纸 #007",
+                link: "https://pan.baidu.com/s/17g973uz7PmJZhuILM5scUg?pwd=ewba"
+            },
+            {
+                id: "SK-008",
+                title: "SK壁纸 #008",
+                link: "https://pan.baidu.com/s/1RYpCMXWpgIN-GbdWaOpI0g?pwd=5z7e"
+            },
+            {
+                id: "SK-009",
+                title: "SK壁纸 #009",
+                link: "https://pan.baidu.com/s/132c6TJRF0WyM0nWk3IJg9g?pwd=42iw"
+            },
+            {
+                id: "SK-010",
+                title: "SK壁纸 #010",
+                link: "https://pan.baidu.com/s/1UdvMT-Yv-Ch8d_A6sO_S_A?pwd=1aip"
+            },
+            {
+                id: "SK-011",
+                title: "SK壁纸 #011",
+                link: "https://pan.baidu.com/s/1KMiyVhR-lf6Q2xnKgwcp1A?pwd=av3r"
+            },
+            {
+                id: "SK-012",
+                title: "SK壁纸 #012",
+                link: "https://pan.baidu.com/s/1TVEsgmtNiFaLSDMQrkb2Zw?pwd=2tsk"
+            },
+            {
+                id: "SK-013",
+                title: "SK壁纸 #013",
+                link: "https://pan.baidu.com/s/1iayQ71oitD3Pk1WCd5_4zw?pwd=bxgr"
+            },
+            {
+                id: "Mirai-001",
+                title: "Mirai壁纸 #001",
+                link: "https://pan.baidu.com/s/1u6taIfZwc8Gjb9cty5jYAg?pwd=2di2"
+            },
+            {
+                id: "Mirai-002",
+                title: "Mirai壁纸 #002",
+                link: "https://pan.baidu.com/s/1lrvUUulgJCeURho77UqJuQ?pwd=hhsd"
+            },
+            {
+                id: "Mirai-003",
+                title: "Mirai壁纸 #003",
+                link: "https://pan.baidu.com/s/1pHAN4D9g10eZc5bVsoHTug?pwd=cw4u"
+            },
+            {
+                id: "Uki-001",
+                title: "Uki壁纸 #001",
+                link: "https://pan.baidu.com/s/1YphdUFdtrAppk8Lh7VbKGw?pwd=h6ap"
+            },
+            {
+                id: "Uki-002",
+                title: "Uki壁纸 #002",
+                link: "https://pan.baidu.com/s/160HkaTtIAxS9b7qdVDF9Nw?pwd=79f3"
+            },
+            {
+                id: "Uki-003",
+                title: "Uki壁纸 #003",
+                link: "https://pan.baidu.com/s/12XGiF_1XGozR-qzAx4yBvQ?pwd=p25h"
+            },
+            {
+                id: "Uki-004",
+                title: "Uki壁纸 #004",
+                link: "https://pan.baidu.com/s/15P_QQEJg3XsCJUn4J1yymw?pwd=uvrf"
+            },
+            {
+                id: "Uki-005",
+                title: "Uki壁纸 #005",
+                link: "https://pan.baidu.com/s/19ko3vhZfQG7T0NbrEuBYYg?pwd=jt7m"
+            },
+            {
+                id: "Rizu-001",
+                title: "Rizu壁纸 #001",
+                link: "https://pan.baidu.com/s/1WvOgIyOrgKQUR-gvZfNUkw?pwd=f16q"
+            },
+            {
+                id: "Rizu-002",
+                title: "Rizu壁纸 #002",
+                link: "https://pan.baidu.com/s/1cLuFjfP2Y8rdfx0fd3flwQ?pwd=hrf8"
+            },
+            {
+                id: "Rizu-003",
+                title: "Rizu壁纸 #003",
+                link: "https://pan.baidu.com/s/15jXv7m4sPwFdZjTL3AhJbA?pwd=4nix"
+            },
+            {
+                id: "Rizu-004",
+                title: "Rizu壁纸 #004",
+                link: "https://pan.baidu.com/s/1197JUewwmSWzUiIWDJP-bg?pwd=qsbf"
+            },
+            {
+                id: "Rizu-005",
+                title: "Rizu壁纸 #005",
+                link: "https://pan.baidu.com/s/1197JUewwmSWzUiIWDJP-bg?pwd=qsbf"
+            },
+            {
+                id: "Rizu-006",
+                title: "Rizu壁纸 #006",
+                link: "https://pan.baidu.com/s/1Smp0ICjS9KUy9mBCHLGDRw?pwd=kgcq"
+            },
+            {
+                id: "AoS-001",
+                title: "AoS壁纸 #001",
+                link: "https://pan.baidu.com/s/1irwGF11bcEUtYi-m6tJqNg?pwd=ykaq"
+            },
+            {
+                id: "AoS-002",
+                title: "AoS壁纸 #002",
+                link: "https://pan.baidu.com/s/1JlnjcN_KYg3AGV8BcP8e4w?pwd=garv"
+            },
+            {
+                id: "AoS-003",
+                title: "AoS壁纸 #003",
+                link: "https://pan.baidu.com/s/1NmVNf8bFaDacyujcFcxlQg?pwd=dhqe"
+            },
+            {
+                id: "AoS-004",
+                title: "AoS壁纸 #004",
+                link: "https://pan.baidu.com/s/1NmVNf8bFaDacyujcFcxlQg?pwd=dhqe"
+            },
+            {
+                id: "AoS-005",
+                title: "AoS壁纸 #005",
+                link: "https://pan.baidu.com/s/1NmVNf8bFaDacyujcFcxlQg?pwd=dhqe"
+            },
+            {
+                id: "AoS-006",
+                title: "AoS壁纸 #006",
+                link: "https://pan.baidu.com/s/1NmVNf8bFaDacyujcFcxlQg?pwd=dhqe"
+            },
+            {
+                id: "AoS-007",
+                title: "AoS壁纸 #007",
+                link: "https://pan.baidu.com/s/1XTZ18hCIojaBpVS0BHpH2g?pwd=8wft"
+            },
+            {
+                id: "AoS-008",
+                title: "AoS壁纸 #008",
+                link: "https://pan.baidu.com/s/1BWfRo_XHFjZrj8Y7WtVPHQ?pwd=ax1m"
+            },
+            {
+                id: "AoS-009",
+                title: "AoS壁纸 #009",
+                link: "https://pan.baidu.com/s/1evTNnzUg7PzLlp5zoZqI6A?pwd=kgud"
+            },
+            {
+                id: "AoS-010",
+                title: "AoS壁纸 #010",
+                link: "https://pan.baidu.com/s/1cEnXCYZcL7m72oyI2VPDoA?pwd=tpeq"
+            },
+            {
+                id: "KD_K-001",
+                title: "KD_K壁纸 #001",
+                link: "https://pan.baidu.com/s/1egyB15d5fDRzFnITGA8I9g?pwd=nix5"
+            },
+            {
+                id: "KD_K-002",
+                title: "KD_K壁纸 #002",
+                link: "https://pan.baidu.com/s/1egyB15d5fDRzFnITGA8I9g?pwd=nix5"
+            },
+            {
+                id: "KD_K-003",
+                title: "KD_K壁纸 #003",
+                link: "https://pan.baidu.com/s/1ID8V6mZbUFkuFuptXcEL2w?pwd=jq35"
+            },
+            {
+                id: "KD_H-001",
+                title: "KD_H壁纸 #001",
+                link: "https://pan.baidu.com/s/1PqI0UtBtMXA3bHGHjtyx-w?pwd=44bz"
+            },
+            {
+                id: "KD_H-002",
+                title: "KD_H壁纸 #002",
+                link: "https://pan.baidu.com/s/1PqI0UtBtMXA3bHGHjtyx-w?pwd=44bz"
+            },
+            {
+                id: "KD_H-003",
+                title: "KD_H壁纸 #003",
+                link: "https://pan.baidu.com/s/1PqI0UtBtMXA3bHGHjtyx-w?pwd=44bz"
+            },
+            {
+                id: "KD_H-004",
+                title: "KD_H壁纸 #004",
+                link: "https://pan.baidu.com/s/1PqI0UtBtMXA3bHGHjtyx-w?pwd=44bz"
+            },
+            {
+                id: "KD_H-005",
+                title: "KD_H壁纸 #005",
+                link: "https://pan.baidu.com/s/1PqI0UtBtMXA3bHGHjtyx-w?pwd=44bz"
+            },
+            {
+                id: "KD_H-006",
+                title: "KD_H壁纸 #006",
+                link: "https://pan.baidu.com/s/1PqI0UtBtMXA3bHGHjtyx-w?pwd=44bz"
+            },
+            {
+                id: "KD_H-007",
+                title: "KD_H壁纸 #007",
+                link: "https://pan.baidu.com/s/1PqI0UtBtMXA3bHGHjtyx-w?pwd=44bz"
+            },
+            {
+                id: "KN-001",
+                title: "KN壁纸 #001",
+                link: "https://pan.baidu.com/s/1KxO5021ggs5mdSmdzKMnUA?pwd=ktqq"
+            },
+            {
+                id: "KN-002",
+                title: "KN壁纸 #002",
+                link: "https://pan.baidu.com/s/1chFOi8bhRp5nmUfFUaPbwg?pwd=143t"
+            },
+            {
+                id: "KN-003",
+                title: "KN壁纸 #003",
+                link: "https://pan.baidu.com/s/1f8PkPEwjR7qhXp-057LzJQ?pwd=urpi"
+            },
+            {
+                id: "KN-004",
+                title: "KN壁纸 #004",
+                link: "https://pan.baidu.com/s/1X-uXXd0lk3Gz29aI3LK66w?pwd=bdic"
+            },
+            {
+                id: "KN-005",
+                title: "KN壁纸 #005",
+                link: "https://pan.baidu.com/s/1ceLLL7sGLacjyzNq8My4-Q?pwd=e2wy"
+            },
+            {
+                id: "DraA-001",
+                title: "DraA壁纸 #001",
+                link: "https://pan.baidu.com/s/1REIa5mI_XUNVvcEhlTG9Fg?pwd=3jji"
+            },
+            {
+                id: "Miya-001",
+                title: "宫崎骏壁纸 #001",
+                link: "https://pan.baidu.com/s/14yea1hu-aThW8OCS1pTcww?pwd=cp4u"
+            },
+            {
+                id: "Naruto-001",
+                title: "火影忍者壁纸 #001",
+                link: "https://pan.baidu.com/s/1zOuIFww9IYVD5c5_0IavVg?pwd=jmrw"
+            },
+            {
+                id: "Furi-001",
+                title: "Furi壁纸 #001",
+                link: "https://pan.baidu.com/s/1k7F9YCU0Ns_LcxiUgtOeIQ?pwd=g42e"
+            },
+            {
+                id: "Furi-002",
+                title: "Furi壁纸 #002",
+                link: "https://pan.baidu.com/s/1cC4LLTfybAZTAmpzIlEUCQ?pwd=vbij"
+            },
+            {
+                id: "Furi-003",
+                title: "Furi壁纸 #003",
+                link: "https://pan.baidu.com/s/14zOm4wm0JlQM7uu_-itkyA?pwd=2db3"
+            },
+            {
+                id: "Furi-004",
+                title: "Furi壁纸 #004",
+                link: "https://pan.baidu.com/s/1i5yE5UIbft3Nnau_qXvl7A?pwd=buuv"
+            },
+            {
+                id: "Furi-005",
+                title: "Furi壁纸 #005",
+                link: "https://pan.baidu.com/s/1fW8liewHtws8xagic-oV3Q?pwd=s4tq"
+            },
+            {
+                id: "Furi-006",
+                title: "Furi壁纸 #006",
+                link: "https://pan.baidu.com/s/1RNnAqbPs77aJa34VBQ7-2Q?pwd=cghe"
+            },
+            {
+                id: "Furi-007",
+                title: "Furi壁纸 #007",
+                link: "https://pan.baidu.com/s/1RNnAqbPs77aJa34VBQ7-2Q?pwd=cghe"
+            },
+            {
+                id: "Furi-008",
+                title: "Furi壁纸 #008",
+                link: "https://pan.baidu.com/s/1RNnAqbPs77aJa34VBQ7-2Q?pwd=cghe"
+            },
+            {
+                id: "Furi-009",
+                title: "Furi壁纸 #009",
+                link: "https://pan.baidu.com/s/1RNnAqbPs77aJa34VBQ7-2Q?pwd=cghe"
+            },
+            {
+                id: "Furi-010",
+                title: "Furi壁纸 #010",
+                link: "https://pan.baidu.com/s/1RNnAqbPs77aJa34VBQ7-2Q?pwd=cghe"
+            },
+            {
+                id: "Furi-011",
+                title: "Furi壁纸 #011",
+                link: "https://pan.baidu.com/s/1RNnAqbPs77aJa34VBQ7-2Q?pwd=cghe"
+            },
+            {
+                id: "Furi-012",
+                title: "Furi壁纸 #012",
+                link: "https://pan.baidu.com/s/1RNnAqbPs77aJa34VBQ7-2Q?pwd=cghe"
+            },
+            {
+                id: "Furi-013",
+                title: "Furi壁纸 #013",
+                link: "https://pan.baidu.com/s/1RNnAqbPs77aJa34VBQ7-2Q?pwd=cghe"
+            },
+            {
+                id: "Furi-014",
+                title: "Furi壁纸 #014",
+                link: "https://pan.baidu.com/s/1RNnAqbPs77aJa34VBQ7-2Q?pwd=cghe"
+            },
+            {
+                id: "Furi-015",
+                title: "Furi壁纸 #015",
+                link: "https://pan.baidu.com/s/1RNnAqbPs77aJa34VBQ7-2Q?pwd=cghe"
+            },
+            {
+                id: "Furi-016",
+                title: "Furi壁纸 #016",
+                link: "https://pan.baidu.com/s/1RNnAqbPs77aJa34VBQ7-2Q?pwd=cghe"
+            },
+        ];
+
+        // ================================
+        // DOM 元素引用
+        // ================================
+        const searchInput = document.getElementById('searchInput');
+        const resultsContainer = document.getElementById('results');
+        const initialHint = document.getElementById('initialHint');
+
+        // ================================
+        // 模糊搜索函数
+        // 支持：精确匹配、前缀匹配、包含匹配
+        // 输入 "1" 可以匹配 "001"、"No.001" 等
+        // ================================
+        function fuzzySearch(keyword, data) {
+            // 如果搜索词为空，返回空数组
+            if (!keyword.trim()) {
+                return [];
+            }
+
+            // 统一转为小写，方便匹配
+            const lowerKeyword = keyword.toLowerCase();
+
+            return data.filter(item => {
+                // 获取序列号和标题，统一转小写
+                const id = item.id.toLowerCase();
+                const title = item.title.toLowerCase();
+
+                // 匹配逻辑：
+                // 1. 序列号以搜索词开头（如 "001" 匹配 "001" 或 "No.001" 中的 "001"）
+                // 2. 序列号包含搜索词
+                // 3. 标题包含搜索词
+                return (
+                    id.includes(lowerKeyword) || 
+                    title.includes(lowerKeyword)
+                );
+            });
+        }
+
+        // ================================
+        // 渲染搜索结果
+        // ================================
+        function renderResults(results) {
+            // 先清除之前的结果（保留初始提示元素）
+            resultsContainer.innerHTML = '';
+
+            // 如果没有搜索词，显示初始提示
+            if (!searchInput.value.trim()) {
+                resultsContainer.innerHTML = `
+                    <div class="initial-hint">
+                        <div class="initial-hint-icon">✨</div>
+                        <p class="initial-hint-text">输入序列号开始搜索吧~</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // 如果没有匹配结果，显示友好提示
+            if (results.length === 0) {
+                resultsContainer.innerHTML = `
+                    <div class="no-results">
+                        <div class="no-results-icon">🔍</div>
+                        <p class="no-results-text">没有找到匹配的壁纸~</p>
+                        <p class="no-results-hint">试试输入其他序列号</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // 渲染匹配到的结果
+            results.forEach(item => {
+                const resultHTML = `
+                    <div class="result-item">
+                        <div class="result-header">
+                            <span class="result-id">No.${item.id}</span>
+                            <span class="result-title">${item.title}</span>
+                        </div>
+                        <a href="${item.link}" target="_blank" class="result-link">
+                            <span class="result-link-icon">📦</span>
+                            <span>百度网盘链接</span>
+                            <span>→</span>
+                        </a>
+                    </div>
+                `;
+                resultsContainer.innerHTML += resultHTML;
+            });
+        }
+
+        // ================================
+        // 实时搜索事件监听
+        // 使用 'input' 事件实现实时匹配
+        // ================================
+        searchInput.addEventListener('input', (e) => {
+            const keyword = e.target.value;
+            const results = fuzzySearch(keyword, wallpaperData);
+            renderResults(results);
+        });
+
+        // ================================
+        // 页面加载完成后自动聚焦搜索框
+        // 提升移动端用户体验
+        // ================================
+        window.addEventListener('load', () => {
+            searchInput.focus();
+        });
+    </script>
+</body>
 </html>
